@@ -1,6 +1,8 @@
 #!/usr/bin/python
 import re
+import requests
 
+import auth
 import connectwise
 
 
@@ -39,6 +41,10 @@ def process_message(incoming_json):
             'id'] + '/activities/' + incoming_json['id']
 
         reply = {'json': return_json, 'url': url}
+        # send request
+        if isinstance(reply, dict) and 'url' in reply.keys() and 'json' in reply.keys():
+            headers = auth.return_auth_header()
+            _ = requests.post(reply['url'], headers=headers, json=reply['json'])
     else:
         reply = 'Error: unsure how to handle.'
 

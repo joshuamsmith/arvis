@@ -2,3 +2,8 @@
 ---
 
 -  Initial version
+
+0.1
+---
+
+-  Built out first service to listen for ticket numbers and return summary and link, added initial authorization functions
