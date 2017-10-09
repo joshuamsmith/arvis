@@ -61,8 +61,8 @@ def return_sr_summary(ticket_id):
     ticket = lookup_sr(ticket_id)
     if ticket.id:
         return '[Ticket #{}](https://na.myconnectwise.net/v4_6_release/services/system_io/Service/' \
-               'fv_sr100_request.rails?service_recid={}&companyName={}): *{}' \
-               ' *{}/{} '.\
+               'fv_sr100_request.rails?service_recid={}&companyName={}): {}' \
+               ' <br>{}/{} '.\
             format(ticket.id, ticket.id, 'wheelhouseit', ticket.summary, ticket.company['name'], ticket.contact['name'])
     else:
         return 'Error: {}'.format(ticket_id)
