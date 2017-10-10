@@ -20,6 +20,24 @@ def process_message(incoming_json):
     # if search_obj:
     #   message = connectwise.????(search_obj.group(1))
 
+    # Let people assign themselves tickets: @arvis !assignme ticket #123456
+    # search_obj = re.search(r'!assignme .* #(\d{6,})', incoming_json['text'])
+    # if search_obj:
+    #     message = connectwise.assign_sr(search_obj.group(1))
+        '''
+        team_member_email = get_team_members_email(message_from)
+        member = connectwise.get_member_by_email(team_member_email)
+        assign_sr(ticket_id, member.identifier)
+        '''
+
+    # Get Team ID
+    search_obj = re.search(r'(!team)', incoming_json['text'])
+    if search_obj:
+        team_id = incoming_json['channelData']['team']['id']
+        from_name = incoming_json['from']['name']
+        print('Team ', team_id)
+        print('User ', from_name)
+
     if message:
         return_json = {
             "type": "message",
@@ -39,7 +57,6 @@ def process_message(incoming_json):
         }
         url = incoming_json['serviceUrl'] + '/v3/conversations/' + incoming_json['conversation'][
             'id'] + '/activities/' + incoming_json['id']
-
         reply = {'json': return_json, 'url': url}
         # send request
         if isinstance(reply, dict) and 'url' in reply.keys() and 'json' in reply.keys():
@@ -49,4 +66,3 @@ def process_message(incoming_json):
         reply = 'Error: unsure how to handle.'
 
     return reply
-

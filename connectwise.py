@@ -10,6 +10,7 @@ import sys
 
 from ConnectPyse.service import tickets_api
 from ConnectPyse.company import companies_api, contacts_api
+from ConnectPyse.system import members_api
 
 
 def lookup_sr(ticket_num):
@@ -55,6 +56,15 @@ def lookup_contact(contact_id):
             raise
         return contact
     return ''
+
+
+def get_member_by_email(email):
+    # member_email = 'joshua.smith@wheelhouseit.com'
+    api = members_api.MembersAPI()
+    api.conditions = 'officeEmail="{}"'.format(email)
+    member = next(api.get_members())
+    # print(member.identifier)
+    return member
 
 
 def return_sr_summary(ticket_id):
