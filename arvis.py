@@ -35,8 +35,7 @@ def process_message(incoming_json):
     if search_obj:
         team_id = incoming_json['channelData']['team']['id']
         from_name = incoming_json['from']['name']
-        print('Team ', team_id)
-        print('User ', from_name)
+        message = 'Team: {}<br>User: {}'.format(team_id, from_name)
 
     if message:
         return_json = {
