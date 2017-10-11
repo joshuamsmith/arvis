@@ -29,7 +29,7 @@ def process_message(incoming_json):
             message = 'Failed. Probably due to IBKAC?'
 
     # Get Team ID
-    if message is not None:
+    if message is None:
         search_obj = re.search(r'(!team)', incoming_json['text'])
         if search_obj:
             team_id = incoming_json['channelData']['team']['id']
@@ -40,7 +40,7 @@ def process_message(incoming_json):
             message = 'Team: {}<br>User: {}'.format(team_id, cw_member.identifier)
 
     # Did someone mention an SR#? Catch all for SR#
-    if message is not None:
+    if message is None:
         search_obj = re.search(r'(\d{6,})', incoming_json['text'])
         if search_obj:
             # Lookup and return SR# details if found
