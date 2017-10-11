@@ -35,7 +35,8 @@ def process_message(incoming_json):
     if search_obj:
         team_id = incoming_json['channelData']['team']['id']
         from_id = incoming_json['from']['id']
-        team_roster = get_team_roster(incoming_json['serviceURL'], team_id)
+        team_roster = get_team_roster(incoming_json['serviceUrl'], team_id)
+        print(team_roster)
         for team_member in team_roster:
             if team_member['id'] == from_id:
                 message = 'Team: {}<br>User: {}'.format(team_id, team_member['email'])
@@ -72,6 +73,6 @@ def process_message(incoming_json):
 
 def get_team_roster(service_url, team_id):
     url = service_url + '/v3/conversations/{}/members'.format(team_id)
-    r = requests.post(url, headers=auth.return_auth_header())
+    r = requests.get(url, headers=auth.return_auth_header())
     team_roster = r.json()
     return team_roster
