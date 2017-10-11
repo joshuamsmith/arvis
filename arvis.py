@@ -34,8 +34,11 @@ def process_message(incoming_json):
     search_obj = re.search(r'(!team)', incoming_json['text'])
     if search_obj:
         team_id = incoming_json['channelData']['team']['id']
-        from_name = incoming_json['from']['name']
-        message = 'Team: {}<br>User: {}'.format(team_id, from_name)
+        from_id = incoming_json['from']['id']
+        team_roster = get_team_roster(incoming_json['serviceURL'], team_id)
+        for team_member in team_roster:
+            if team_member['id'] == from_id:
+                message = 'Team: {}<br>User: {}'.format(team_id, team_member['email'])
 
     if message:
         return_json = {
@@ -65,3 +68,10 @@ def process_message(incoming_json):
         reply = 'Error: unsure how to handle.'
 
     return reply
+
+
+def get_team_roster(service_url, team_id):
+    url = service_url + '/v3/conversations/{}/members'.format(team_id)
+    r = requests.post(url, headers=auth.return_auth_header())
+    team_roster = r.json()
+    return team_roster
