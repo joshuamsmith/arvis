@@ -39,7 +39,8 @@ def process_message(incoming_json):
         print(team_roster)
         for team_member in team_roster:
             if team_member['id'] == from_id:
-                message = 'Team: {}<br>User: {}'.format(team_id, team_member['email'])
+                cw_member = connectwise.get_member_by_email(team_member['email'])
+                message = 'Team: {}<br>User: {}'.format(team_id, cw_member.identifier)
 
     if message:
         return_json = {
