@@ -15,7 +15,7 @@ def process_message(incoming_json):
     #   message = connectwise.????(search_obj.group(1))
 
     # Let people assign themselves tickets: @arvis !assignme ticket #123456
-    search_obj = re.search(r'!assignme .* #(\d{6,})', incoming_json['text'])
+    search_obj = re.search(r'!assignme #?(\d{6,})', incoming_json['text'])
     if search_obj:
         team_id = incoming_json['channelData']['team']['id']
         from_id = incoming_json['from']['id']
