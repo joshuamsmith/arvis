@@ -9,12 +9,6 @@ import connectwise
 def process_message(incoming_json):
     message = None
 
-    # Did someone mention an SR#?
-    search_obj = re.search(r'(\d{6,})', incoming_json['text'])
-    if search_obj:
-        # Lookup and return SR# details if found
-        message = connectwise.return_sr_summary(search_obj.group(1))
-
     # Did they do something else? Look for it in the TEXT value
     # search_obj = re.search(r'(FOO)', incoming_json['text'])
     # if search_obj:
@@ -28,17 +22,29 @@ def process_message(incoming_json):
         team_roster = get_team_roster(incoming_json['serviceUrl'], team_id)
         team_member = get_member_from_team(team_roster, from_id)
         cw_member = connectwise.get_member_by_email(team_member['email'])
-        message = connectwise.assign_sr(search_obj.group(1), cw_member.identifier)
+        new_se = connectwise.assign_sr(search_obj.group(1), cw_member.identifier)
+        if True:
+            message = 'Successfully added {} to Ticket #{}'.format(new_se.member['name'], new_se.objectId)
+        else:
+            message = 'Failed. Probably due to IBKAC?'
 
     # Get Team ID
-    search_obj = re.search(r'(!team)', incoming_json['text'])
-    if search_obj:
-        team_id = incoming_json['channelData']['team']['id']
-        from_id = incoming_json['from']['id']
-        team_roster = get_team_roster(incoming_json['serviceUrl'], team_id)
-        team_member = get_member_from_team(team_roster, from_id)
-        cw_member = connectwise.get_member_by_email(team_member['email'])
-        message = 'Team: {}<br>User: {}'.format(team_id, cw_member.identifier)
+    if message is not None:
+        search_obj = re.search(r'(!team)', incoming_json['text'])
+        if search_obj:
+            team_id = incoming_json['channelData']['team']['id']
+            from_id = incoming_json['from']['id']
+            team_roster = get_team_roster(incoming_json['serviceUrl'], team_id)
+            team_member = get_member_from_team(team_roster, from_id)
+            cw_member = connectwise.get_member_by_email(team_member['email'])
+            message = 'Team: {}<br>User: {}'.format(team_id, cw_member.identifier)
+
+    # Did someone mention an SR#? Catch all for SR#
+    if message is not None:
+        search_obj = re.search(r'(\d{6,})', incoming_json['text'])
+        if search_obj:
+            # Lookup and return SR# details if found
+            message = connectwise.return_sr_summary(search_obj.group(1))
 
     if message:
         return_json = {
