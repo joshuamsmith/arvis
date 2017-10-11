@@ -21,14 +21,14 @@ def process_message(incoming_json):
     #   message = connectwise.????(search_obj.group(1))
 
     # Let people assign themselves tickets: @arvis !assignme ticket #123456
-    # search_obj = re.search(r'!assignme .* #(\d{6,})', incoming_json['text'])
-    # if search_obj:
-    #     message = connectwise.assign_sr(search_obj.group(1))
-        '''
-        team_member_email = get_team_members_email(message_from)
-        member = connectwise.get_member_by_email(team_member_email)
-        assign_sr(ticket_id, member.identifier)
-        '''
+    search_obj = re.search(r'!assignme .* #(\d{6,})', incoming_json['text'])
+    if search_obj:
+        team_id = incoming_json['channelData']['team']['id']
+        from_id = incoming_json['from']['id']
+        team_roster = get_team_roster(incoming_json['serviceUrl'], team_id)
+        team_member = get_member_from_team(team_roster, from_id)
+        cw_member = connectwise.get_member_by_email(team_member['email'])
+        message = connectwise.assign_sr(search_obj.group(1), cw_member.identifier)
 
     # Get Team ID
     search_obj = re.search(r'(!team)', incoming_json['text'])
@@ -36,11 +36,9 @@ def process_message(incoming_json):
         team_id = incoming_json['channelData']['team']['id']
         from_id = incoming_json['from']['id']
         team_roster = get_team_roster(incoming_json['serviceUrl'], team_id)
-        print(team_roster)
-        for team_member in team_roster:
-            if team_member['id'] == from_id:
-                cw_member = connectwise.get_member_by_email(team_member['email'])
-                message = 'Team: {}<br>User: {}'.format(team_id, cw_member.identifier)
+        team_member = get_member_from_team(team_roster, from_id)
+        cw_member = connectwise.get_member_by_email(team_member['email'])
+        message = 'Team: {}<br>User: {}'.format(team_id, cw_member.identifier)
 
     if message:
         return_json = {
@@ -77,3 +75,10 @@ def get_team_roster(service_url, team_id):
     r = requests.get(url, headers=auth.return_auth_header())
     team_roster = r.json()
     return team_roster
+
+
+def get_member_from_team(team, member_id):
+    for team_member in team:
+        if team_member['id'] == member_id:
+            return team_member
+    return False
